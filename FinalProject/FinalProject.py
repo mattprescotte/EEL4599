@@ -16,6 +16,7 @@ from digi.xbee.devices import XBeeDevice
 from digi.xbee.io import IOLine, IOMode
 import time
 import threading
+import requests
 
 # The serial port where the local module is connected to.
 PORT = "COM12"
@@ -79,9 +80,14 @@ def main():
                 #rssi_val = struct.unpack('=B', rssi_raw)
                 
                 # Print values
-                print("%0.2f C, %0.2f g" % (temperature, weight))
+                roundedTemp = float('%.5g' % temperature)
+	            roundedPres = float('%.5g' % weight)
+                print(str(roundedTemp) + " C, " + str(roundedPres) + " g")
                 #print("%0.2f C, %0.2f g, %d dBm" % (temperature, weight, rssi_val))
                 
+                #Input request to thingspeak
+                requestLink = "http://api.thingspeak.com/update?api_key=8O0PFDFMUYX0ARAN&field1=" + str(roundedTemp) + "&field2=" + str(roundedPres)
+                requests.get(requestLink)
                 
                 time.sleep(1)
 
